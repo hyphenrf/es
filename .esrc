@@ -46,7 +46,7 @@ XDG_CACHE_HOME=$HOME/.local/tmp
 XDG_DATA_HOME=$HOME/.local/share
 
 # opam
-if {! empty `{whatis opam >[2] /dev/null}}{
+if {! empty `{which opam}}{
   eval `{opam env | sed '/^#/d;s/; export.*//'}
 }
 
