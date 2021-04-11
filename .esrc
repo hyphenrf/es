@@ -1,0 +1,73 @@
+# functions
+fn empty var {
+   ~ $#var 0
+}
+
+fn alias name cmd {
+   if {~ $name $cmd(1)} {cmd = <={%whatis $cmd(1)} $cmd(2 ...)}
+   fn-$name = $cmd
+}
+
+fn with-bash cmd {
+   local (SHELL = <={let (fn-bash = ) %whatis bash}) $cmd
+}
+
+fn noexport vars {
+   noexport = ($noexport $vars)
+}
+
+noexport fn-always-with-bash
+fn always-with-bash cmd {
+  let (def = <={%whatis $cmd})
+    fn-$cmd = with-bash $def
+}
+
+
+# env
+noexport fn-empty-or fn-conc fn-id
+fn empty-or f var val ext {
+   if {empty $var}{
+      return $val
+   }{
+      $f $var $val $ext
+   }
+}
+fn conc l r sep { return $l$sep$r }
+fn id x { return $x }
+
+history  = ~/.es_history
+NO_COLOR = 1
+EDITOR   = vis
+
+PATH = <={ empty-or $fn-conc $PATH $HOME/.local/bin : }
+XDG_RUNTIME_DIR = <={ empty-or $fn-id $XDG_RUNTIME_DIR /var/run/user/$USER }
+XDG_CONFIG_HOME=$HOME/.local/etc
+XDG_CACHE_HOME=$HOME/.local/tmp
+XDG_DATA_HOME=$HOME/.local/share
+
+# opam
+if {! empty `{whatis opam >[2] /dev/null}}{
+  eval `{opam env | sed '/^#/d;s/; export.*//'}
+}
+
+
+
+# aliases
+alias vi        vis
+alias v         vis
+#alias e         emacs
+alias lc        ls -xF '--color=none'
+alias ls        ls -1 '--color=none'
+alias psh       powershell.exe
+alias py        python3
+alias pastebin  nc tcp.st 7777
+
+fn goarm args {
+  let (GOARCH = arm) {
+      go build -ldflags '-s -w' $args
+  }
+}
+
+
+# set cwd as home
+cd
