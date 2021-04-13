@@ -77,7 +77,11 @@ fn hoogle qs {
                     --data-urlencode 'hoogle='''$q'''' -: } |
 
    sed 's/-:\s*$//' | xargs curl |
-   jq -rM '.[]|"\(.item)|\(.package.name)::\(.module.name)"' | column -t -s'|'
+   jq -rM '
+     .[] | "\(.item)|"
+     +if .package.name then "\(.package.name)"  else "" end
+     +if .module.name  then "::\(.module.name)" else "" end
+   '| column -t -s'|'
 }
 
 
