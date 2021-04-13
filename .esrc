@@ -77,3 +77,22 @@ fn goarm args {
 
 # set cwd as home
 cd
+
+
+
+# fun meta stuff
+
+let (create = $fn-%create)
+fn %create fd file cmd {
+   # overriding the pipe '>' to something equivalent to `noclobber`
+   if {test -f $file} {
+      throw error $0 'file exists: use `clobber '$file'`'
+   }{
+      $create $fd $file $cmd
+   }
+}
+
+fn clobber file {
+   # ..then making an explicit clobbering function
+   $&openfile w 1 $file true
+}
