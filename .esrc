@@ -4,27 +4,21 @@ fn empty var {
 }
 
 fn alias name cmd {
-   if {~ $name $cmd(1)} {cmd = <={%whatis $cmd(1)} $cmd(2 ...)}
+   if {~ $name $cmd(1)} {cmd =<= {%whatis $cmd(1)} $cmd(2 ...)}
    fn-$name = $cmd
 }
 
 fn with-bash cmd {
-   local (SHELL = <={let (fn-bash = ) %whatis bash}) $cmd
+   local (SHELL =<= {let (fn-bash = ) %whatis bash}) $cmd
 }
 
-fn noexport vars {
-   noexport = ($noexport $vars)
-}
-
-noexport fn-always-with-bash
 fn always-with-bash cmd {
-  let (def = <={%whatis $cmd})
+  let (def =<= {%whatis $cmd})
     fn-$cmd = with-bash $def
 }
-
+noexport = $noexport fn-always-with-bash
 
 # env
-noexport fn-empty-or fn-conc fn-id
 fn empty-or f var val ext {
    if {empty $var}{
       return $val
@@ -32,15 +26,17 @@ fn empty-or f var val ext {
       $f $var $val $ext
    }
 }
-fn conc l r sep { return $l$sep$r }
-fn id x { return $x }
+
+conc = @ l r sep { return $l$sep$r }
+id = @ x { return $x }
+noexport = $noexport fn-empty-or conc id
 
 history  = ~/.es_history
 NO_COLOR = 1
 EDITOR   = vis
 
-PATH = <={ empty-or $fn-conc $PATH $HOME/.local/bin : }
-XDG_RUNTIME_DIR = <={ empty-or $fn-id $XDG_RUNTIME_DIR /var/run/user/$USER }
+PATH =<= { empty-or $conc $PATH $HOME/.local/bin : }
+XDG_RUNTIME_DIR =<= { empty-or $id $XDG_RUNTIME_DIR /var/run/user/$USER }
 XDG_CONFIG_HOME=$HOME/.local/etc
 XDG_CACHE_HOME=$HOME/.local/tmp
 XDG_DATA_HOME=$HOME/.local/share
