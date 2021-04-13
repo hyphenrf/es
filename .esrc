@@ -63,7 +63,7 @@ alias py        python3
 alias pastebin  nc tcp.st 7777
 
 fn goarm args {
-  let (GOARCH = arm) {
+  local (GOARCH = arm) {
       go build -ldflags '-s -w' $args
   }
 }
