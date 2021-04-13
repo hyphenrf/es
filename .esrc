@@ -71,8 +71,11 @@ fn goarm args {
 }
 
 fn hoogle qs {
-   curl -s \
-   'https://https://haskell.org?count=10&mode=json&format=text&hoogle='$qs |
+   # build the commandline with proper quoting
+   cmd = `{ for(q=$qs) echo -sG 'https://hoogle.haskell.org' \
+                       --data-urlencode 'hoogle='''$q'''' \
+                       -d 'count=10' -d 'mode=json' -d 'format=text' -: }
+   xargs curl <<<$^cmd |
    jq -rM '.[]|"\(.item)|\(.package.name)::\(.module.name)"' | column -t -s'|'
 }
 
