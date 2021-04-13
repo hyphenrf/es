@@ -70,6 +70,12 @@ fn goarm args {
   }
 }
 
+fn hoogle qs {
+   curl -s \
+   'https://https://haskell.org?count=10&mode=json&format=text&hoogle='$qs |
+   jq -rM '.[]|"\(.item)|\(.package.name)::\(.module.name)"' | column -t -s'|'
+}
+
 
 # set cwd as home
 cd
