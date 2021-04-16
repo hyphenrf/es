@@ -70,18 +70,11 @@ fn goarm args {
   }
 }
 
-fn hoogle qs {
-   # build the commandline with proper quoting
-   echo `{ for(q=$qs) echo -sG 'https://hoogle.haskell.org' \
-              -d 'count=10' -d 'mode=json' -d 'format=text' \
-                    --data-urlencode 'hoogle='''$q'''' -: } |
-
-   sed 's/-:\s*$//' | xargs curl |
-   jq -rM '
-     .[] | "\(.item)|"
-     +if .package.name then "\(.package.name)"  else "" end
-     +if .module.name  then "::\(.module.name)" else "" end
-   '| column -t -s'|'
+fn hoogle queries {
+   xargs curl <<< <={ %flatten ' -: ' \
+     '-sG https://hoogle.haskell.org -d count=10 -d mode=json -d format=text
+      --data-urlencode hoogle='''$queries''''
+   } |jq -r '.[]|.item+"`"+.package.name?+("::"+.module.name?)' |column -ts'`'
 }
 
 
