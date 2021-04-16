@@ -74,7 +74,7 @@ fn hoogle queries {
    xargs curl <<< <={ %flatten ' -: ' \
      '-sG https://hoogle.haskell.org -d count=10 -d mode=json -d format=text
       --data-urlencode hoogle='''$queries''''
-   } |jq -r '.[]|.item+"`"+.package.name?+("::"+.module.name?)' |column -ts'`'
+   } |jq -r '.[]|.item+"`"+.package.name?+"`"+.module.name?' |column -ts'`'
 }
 
 
