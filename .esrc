@@ -63,6 +63,12 @@ if {! empty `{which opam}} {
    oref
 }
 
+# windows env helper
+fn winenv name {
+   name =<= {%one $name}
+   powershell.exe '$env:'$name |sed -E 's/\s+$//'
+}
+
 
 
 # aliases
@@ -98,8 +104,10 @@ fn ipinfo ip {
    curl -w '\n' -s 'https://ipinfo.io/'$ip
 }
 
-# set cwd as home
-cd
+# set cwd as home when launching from windows terminal
+local (cwd = `{pwd}) {
+   {~ $cwd /mnt/c/Users/`{winenv USERNAME}} && cd
+}
 
 
 
