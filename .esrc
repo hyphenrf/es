@@ -13,6 +13,13 @@ fn alias name cmd {
    fn-$name = $cmd
 }
 
+fn switch match cases {
+   let ((case body rest) = $cases)
+    if { eval '~' $match $case } {
+       $body
+    }{ switch $match $rest }
+}
+
 fn with-bash cmd {
    local (SHELL =<= {let (fn-bash = ) %whatis bash}) $cmd
 }
