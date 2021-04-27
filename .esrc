@@ -1,7 +1,23 @@
 # functions
+############
+#
+# fn-empty:             returns whether a var is ()
+# fn-%*:                convenience arithmetic functions
+# fn-(car cdr ini fin): list ops
+# fn-alias:             alias a cmd, taken from the es examples
+# fn-switch:            implementation of the switch statement
+#    usage: switch expr ( pattern { body }
+#                         pattern { body } ...
+#                         '*'     { default body } )
+# [always-]with-bash:   for commands that don't behave well under es
+# fn-edfn:              edfn fn cmd: applies cmd on the function text
+#
+############
+
 fn empty var { ~ $#var 0 }
 
 fn %% { bc <<<$^* }
+fn %! { bc -l <<<$^* }
 
 fn car xs { return $xs(1) }
 fn cdr xs { return $xs(2 ...) }
@@ -37,6 +53,17 @@ fn edfn fname cmd {
 
 
 # env
+######
+#
+# notes:
+#  - flatten on PATH: if PATH is empty, flatten gets just one param
+#                     and gets no `:'
+#  - XDG_RUNTIME_DIR: car picks first non-empty arg of its arglist
+#
+#  fn-oref:   refereshes opam env, defined conditionally
+#  fn-winenv: grab a var from the windows env
+#
+######
 
 history  = ~/.es_history
 NO_COLOR = 1
@@ -68,6 +95,8 @@ fn winenv name {
 
 
 # aliases
+##########
+
 alias vi        vis
 alias v         vis
 #alias e         emacs
@@ -85,6 +114,22 @@ fn goarm args {
   }
 }
 
+# hoogle
+#
+# queries hoogle with n queries. there are some problems with a straightforward
+# implementation..
+#
+# queries can have spaces in them. they can have special chars. they must be
+# urlencoded and quoted. we can invoke multiple curls, more normally inside a
+# for-loop, but one curl with many urls + params each group of which separated
+# by `-:'
+# xargs is then crucial because it re-separates args from their one contiguous
+# string repr. using eval here would lose quoting, and using the builtin split
+# function would split spaces too eagerly (even inside the quoted query).
+#
+# haskell's least used symbol in typedefs perhaps is backtick. Therefore it's
+# used as the column separator.
+#
 fn hoogle queries {
    xargs curl <<< <={ %flatten ' -: ' \
      '-sG https://hoogle.haskell.org -d count=10 -d mode=json -d format=text
@@ -100,7 +145,10 @@ fn ipinfo ip {
    curl -w '\n' -s 'https://ipinfo.io/'$ip
 }
 
+
+
 # set cwd as home when launching from windows terminal
+#
 local (cwd = `{pwd}) {
    {~ $cwd /mnt/c/Users/`{winenv USERNAME}} && cd
 }
@@ -108,7 +156,10 @@ local (cwd = `{pwd}) {
 
 
 # fun meta stuff
+#################
 
+# first we need to preserve the old %create (aka `>') behaviour
+#
 let (create = $fn-%create)
 fn %create fd file cmd {
    # overriding the pipe '>' to something equivalent to `noclobber`
