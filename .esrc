@@ -108,8 +108,9 @@ cd
 let (create = $fn-%create)
 fn %create fd file cmd {
    # overriding the pipe '>' to something equivalent to `noclobber`
-   if {test -f $file} {
-      throw error $0 'file exists: use `clobber '$file'`'
+   if {access -w $file} {
+      echo 'appending because file exists - use `clobber '$file'` to overwrite' >[1=2]
+      %append $fd $file $cmd
    }{
       $create $fd $file $cmd
    }
