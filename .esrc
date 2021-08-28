@@ -185,18 +185,20 @@ local (cwd = `{pwd}) {
 
 # first we need to preserve the old %create (aka `>') behaviour
 #
-let (create = $fn-%create)
-fn %create fd file cmd {
-   # overriding the pipe '>' to something equivalent to `noclobber`
-   if {access -w $file} {
-      echo 'appending because file exists - use `clobber '$file'` to overwrite' >[1=2]
-      %append $fd $file $cmd
-   }{
-      $create $fd $file $cmd
-   }
-}
+#let (create = $fn-%create)
+#fn %create fd file cmd {
+#   # overriding the pipe '>' to something equivalent to `noclobber`
+#   if {access -fw $file} {
+#      echo >[1=2] \
+#        'appending because file exists - use `clobber '$file'` to overwrite'
+#      %append $fd $file $cmd
+#   }{
+#      $create $fd $file $cmd
+#   }
+#}
 
-fn clobber file {
-   # ..then making an explicit clobbering function
-   $&openfile w 1 $file true
-}
+#fn clobber file {
+#   # ..then making an explicit clobbering function
+#   $&openfile w 1 $file true
+#}
+
