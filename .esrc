@@ -9,6 +9,8 @@
 #    usage: switch expr ( pattern { body }
 #                         pattern { body } ...
 #                         '*'     { default body } )
+# fn-export:            nop function, for compat with sh, useful in {opam env}
+# 'fn-:':               nop function
 # [always-]with-bash:   for commands that don't behave well under es
 # fn-edfn:              edfn fn cmd: applies cmd on the function text
 #
@@ -36,6 +38,9 @@ fn switch match cases {
        $body
     }{ switch $match $rest }
 }
+
+fn export {}
+fn : {}
 
 fn with-bash cmd {
    local (SHELL =<= {let (fn-bash = ) %whatis bash}) $cmd
