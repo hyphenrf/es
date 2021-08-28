@@ -210,6 +210,14 @@ fn rgbcol s r g b {
         ^ \1\033[0m\2
 }
 
+# colorful prompt :)
+#
+# let (colors = <={ rgbcol '>'   0  56 168 } ^\
+#               <={ rgbcol '>' 115  79 150 } ^\
+#               <={ rgbcol '>' 215   2 112 } )
+#
+# prompt = $colors' ' '> '
+
 # override prompt to take a different color on nonzero
 #
 let (
