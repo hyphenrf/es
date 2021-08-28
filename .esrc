@@ -44,7 +44,6 @@ fn always-with-bash cmd {
   let (def =<= {%whatis $cmd})
     fn-$cmd = with-bash $def
 }
-noexport = $noexport fn-always-with-bash
 
 fn edfn fname cmd {
    eval `{var fn-$fname | $cmd}
