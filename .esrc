@@ -16,6 +16,7 @@
 
 fn empty var { ~ $#var 0 }
 
+# TODO: bug: {%% 2 * 3} expands the globstar
 fn %% { bc <<<$^* }
 fn %! { bc -l <<<$^* }
 
@@ -85,7 +86,7 @@ XDG_DATA_HOME=$HOME/.local/share
 if {! empty `{which opam}} {
    fn oref {
       let (ifs=\n)
-      for (i=`{opam env |sed '/^#/d;s/; export.*//'})
+      for (i=`{opam env $* |sed '/^#/d;s/; export.*//'})
           eval $i
       return 0
    }
