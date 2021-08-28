@@ -182,7 +182,54 @@ local (cwd = `{pwd}) {
 
 # fun meta stuff
 #################
+#
+# fn-%prompt : runs before the prompt is printed
+#
+#################
 
+# capture the $status of every command on evaluation
+# and reset $status at the beginning of every shell session
+#
+fn %eval-noprint { status = <=$* }
+
+let (loop = $fn-%interactive-loop)
+ fn %interactive-loop { status = 0; $loop }
+
+let (loop = $fn-%batch-loop)
+ fn %batch-loop { status = 0; $loop }
+
+
+# colorize any text by rgb values
+#
+fn rgbcol s r g b {
+   # \1...\2 are delimiters understood by readline to indicate nonprintable
+   # chars and make column calculations accurate for prompt etc..
+   # they generalize bash's \[...\] builtin solution.
+   return \1\033[38\;2\;^ $r ^\;^ $g ^\;^ $b ^m\2 \
+        ^ $s \
+        ^ \1\033[0m\2
+}
+
+# override prompt to take a different color on nonzero
+#
+let (
+  # TODO: x = 1 returns 1; and is thus a "nonzero status"
+  fn nonzero i {
+     ! { empty $i || ~ $^i 0 } && # not empty or zero
+     echo $i |grep -Eq '^[0-9]+$' # numeric only (es can return other things as status)
+  }
+  ogprom = $prompt
+)
+fn %prompt {
+   if { nonzero $status } {
+      prompt = <={ rgbcol $ogprom(1) 255 55 55 } $ogprom(2 ...)
+   }{
+      prompt = $ogprom
+   }
+}
+
+
+# noclobber:
 # first we need to preserve the old %create (aka `>') behaviour
 #
 #let (create = $fn-%create)
