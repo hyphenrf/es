@@ -138,6 +138,12 @@ fn goarm args {
 # haskell's least used symbol in typedefs perhaps is backtick. Therefore it's
 # used as the column separator.
 #
+# Despite all this, the function is still quite fragile, and better served by
+# a real programming language which won't lose the structure of the input
+# between transformations.
+#
+# Example bug: you can't use this to search for foldl' because of the quote
+#
 fn hoogle queries {
    xargs curl <<< <={ %flatten ' -: ' \
      '-sG https://hoogle.haskell.org -d count=10 -d mode=json -d format=text
