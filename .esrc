@@ -31,7 +31,7 @@ fn alias name cmd {
 
 fn switch match cases {
    let ((case body rest) = $cases)
-    if { eval '~' $match $case } {
+    if { eval '~' $match $case }{
        $body
     }{ switch $match $rest }
 }
@@ -89,7 +89,7 @@ if {! empty `{which opam}} {
 # windows env helper
 fn winenv name {
    name =<= {%one $name}
-   powershell.exe '$env:'$name |sed -E 's/\s+$//'
+   psh '$env:'$name |sed -E 's/\s+$//'
 }
 
 
@@ -109,9 +109,7 @@ alias pastebin  nc tcp.st 7777
 fn g { grep -rn $1 . }
 
 fn goarm args {
-  local (GOARCH = arm) {
-      go build -ldflags '-s -w' $args
-  }
+   local (GOARCH = arm) go build -ldflags '-s -w' $args
 }
 
 # hoogle
@@ -142,7 +140,8 @@ fn pkgbuild queries {
 }
 
 fn ipinfo ip {
-   curl -w '\n' -s 'https://ipinfo.io/'$ip
+   # empty $v ? abc$v = () : abc$^v = abc
+   curl -w '\n' -s https://ipinfo.io/$^ip
 }
 
 
