@@ -147,24 +147,20 @@ fn goarm args {
 # urlencoded and quoted. we can invoke multiple curls, more normally inside a
 # for-loop, but one curl with many urls + params each group of which separated
 # by `-:'
-# xargs is then crucial because it re-separates args from their one contiguous
-# string repr. using eval here would lose quoting, and using the builtin split
-# function would split spaces too eagerly (even inside the quoted query).
 #
-# haskell's least used symbol in typedefs perhaps is backtick. Therefore it's
-# used as the column separator.
-#
-# Despite all this, the function is still quite fragile, and better served by
-# a real programming language which won't lose the structure of the input
-# between transformations.
-#
-# Example bug: you can't use this to search for foldl' because of the quote
+# to avoid parsing problems, we use \1 as a special separator as \0 has some
+# problems of its own.
 #
 fn hoogle queries {
-   xargs curl <<< <={ %flatten ' -: ' \
-     '-sG https://hoogle.haskell.org -d count=10 -d mode=json -d format=text
-      --data-urlencode hoogle='''$queries''''
-   } |jq -r '.[]|.item+"`"+.package.name?+"`"+.module.name?' |column -ts'`'
+   let (
+     params = <={%flatten '' (
+       -G \1 'https://hoogle.haskell.org' \1
+       -d \1 'count=10' \1 -d \1 'mode=json' \1 -d \1 'format=text' \1
+       --data-urlencode \1 'hoogle='
+     )}
+   ) curl -sf <={%split \1 <={%flatten \1-:\1  $params ^ $queries}} \
+   | jq -r '.[] |.item +"'\1'"+.package.name?+"'\1'"+.module.name?' \
+   | column -ts \1
 }
 
 fn pkgbuild queries {
