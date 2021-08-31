@@ -195,7 +195,8 @@ local (cwd = `{pwd}) {
 # fun meta stuff
 #################
 #
-# fn-%prompt : runs before the prompt is printed
+# fn-%prompt: runs before the prompt is printed
+# fn-rgbcol:  rgbcol string r g b returns ansi colored string
 #
 #################
 
