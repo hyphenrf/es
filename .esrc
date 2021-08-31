@@ -4,14 +4,15 @@
 # fn-empty:             returns whether a var is ()
 # fn-%*:                convenience arithmetic functions
 # fn-(car cdr ini fin): list ops
-# fn-alias:             alias a cmd, taken from the es examples
+# fn-map:               map f xs
 # fn-switch:            implementation of the switch statement
 #    usage: switch expr ( pattern { body }
 #                         pattern { body } ...
 #                         '*'     { default body } )
+# fn-alias:             alias a cmd, taken from the es examples
+# [always-]with-bash:   for commands that don't behave well under es
 # fn-export:            nop function, for compat with sh, useful in {opam env}
 # 'fn-:':               nop function
-# [always-]with-bash:   for commands that don't behave well under es
 # fn-edfn:              edfn fn cmd: applies cmd on the function text
 #
 ############
@@ -27,9 +28,12 @@ fn cdr xs { return $xs(2 ...) }
 fn ini xs { return $xs(1 ... `{%% $#xs - 1}) }
 fn fin xs { return $xs($#xs) }
 
-fn alias name cmd {
-   if {~ $name $cmd(1)} {cmd =<= {%whatis $cmd(1)} $cmd(2 ...)}
-   fn-$name = $cmd
+fn map f xs {
+   if { empty $xs }{
+      return $xs
+   }{
+      return <={$f $xs(1)} <={map $f $xs(2 ...)}
+   }
 }
 
 fn switch match cases {
@@ -39,8 +43,10 @@ fn switch match cases {
     }{ switch $match $rest }
 }
 
-fn export {}
-fn : {}
+fn alias name cmd {
+   if {~ $name $cmd(1)} {cmd = <={%whatis $cmd(1)} $cmd(2 ...)}
+   fn-$name = $cmd
+}
 
 fn with-bash cmd {
    local (SHELL =<= {let (fn-bash = ) %whatis bash}) $cmd
@@ -50,6 +56,11 @@ fn always-with-bash cmd {
   let (def =<= {%whatis $cmd})
     fn-$cmd = with-bash $def
 }
+
+# TODO: bug: `export x` should be nop, `export x=3` should assign x
+fn export {}
+# TODO: bug: `:` should be in $fn-%eval*, so that `: x=3` is valid syntax
+fn : {}
 
 fn edfn fname cmd {
    eval `{var fn-$fname | $cmd}
