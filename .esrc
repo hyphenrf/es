@@ -49,11 +49,11 @@ fn alias name cmd {
 }
 
 fn with-bash cmd {
-   local (SHELL =<= {let (fn-bash = ) %whatis bash}) $cmd
+   local (SHELL = <={let (fn-bash = ) %whatis bash}) $cmd
 }
 
 fn always-with-bash cmd {
-  let (def =<= {%whatis $cmd})
+  let (def = <={%whatis $cmd})
     fn-$cmd = with-bash $def
 }
 
@@ -92,8 +92,8 @@ path = (
   $(path)
 )
 
-PATH =<= {%flatten : $(path) . }
-XDG_RUNTIME_DIR =<= {car $XDG_RUNTIME_DIR /var/run/user/$USER}
+PATH = <={%flatten : $(path) .}
+XDG_RUNTIME_DIR = <={car $XDG_RUNTIME_DIR /var/run/user/$USER}
 XDG_CONFIG_HOME=$HOME/.local/etc
 XDG_CACHE_HOME=$HOME/.local/tmp
 XDG_DATA_HOME=$HOME/.local/share
@@ -110,9 +110,8 @@ if {! empty `{which opam}} {
 }
 
 # windows env helper
-fn winenv name {
-   name =<= {%one $name}
-   psh '$env:'$name |sed -E 's/\s+$//'
+fn winenv {
+   psh '$env:'$1 |sed -E 's/\s+$//'
 }
 
 
