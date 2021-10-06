@@ -229,7 +229,9 @@ fn rgbcol s r g b {
 #               <={ rgbcol '>' 115  79 150 } ^\
 #               <={ rgbcol '>' 215   2 112 } )
 #
-# prompt = $colors' ' '> '
+# prompt = $colors' ' '> ' '>>> '
+
+prompt = $prompt $prompt(1)
 
 # override prompt to take a different color on nonzero
 #
@@ -243,7 +245,7 @@ let (
 )
 fn %prompt {
    if { nonzero $status } {
-      prompt = <={ rgbcol $ogprom(1) 255 55 55 } $ogprom(2 ...)
+      prompt = <={ rgbcol $ogprom(3) 255 55 55 } $ogprom(2 ...)
    }{
       prompt = $ogprom
    }
