@@ -5,6 +5,7 @@
 # fn-%*:                convenience arithmetic functions
 # fn-(car cdr ini fin): list ops
 # fn-map:               map f xs
+# fn-filter:            filter p xs
 # fn-switch:            implementation of the switch statement
 #    usage: switch expr ( pattern { body }
 #                         pattern { body } ...
@@ -33,6 +34,16 @@ fn map f xs {
       return $xs
    }{
       return <={$f $xs(1)} <={map $f $xs(2 ...)}
+   }
+}
+
+fn filter p xs {
+   if { empty $xs }{
+      return $xs
+   }{
+      return <={
+        if { $p $xs(1) }{ result $xs(1) }{ result () }
+      } <={filter $p $xs(2 ...)}
    }
 }
 
