@@ -7,9 +7,9 @@
 # fn-map:               map f xs
 # fn-filter:            filter p xs
 # fn-switch:            implementation of the switch statement
-#    usage: switch expr ( pattern { body }
-#                         pattern { body } ...
-#                         '*'     { default body } )
+#    usage: switch expr ( 'pattern' { body }
+#                         'pattern' { body } ...
+#                         '*'       { default body } )
 # fn-alias:             alias a cmd, taken from the es examples
 # [always-]with-bash:   for commands that don't behave well under es
 # fn-export:            nop function, for compat with sh, useful in {opam env}
@@ -18,7 +18,7 @@
 #
 ############
 
-fn empty var { ~ $#var 0 }
+fn empty {~ $* ()}
 
 # TODO: bug: {%% 2 * 3} expands the globstar
 fn %% { bc <<<$^* }
