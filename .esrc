@@ -55,7 +55,9 @@ fn switch match cases {
 }
 
 fn alias name cmd {
-   if {~ $name $cmd(1)} {cmd = <={%whatis $cmd(1)} $cmd(2 ...)}
+   if {~ $name $cmd(1)} {cmd = <={
+     catch @{ result $cmd(1) }{ %whatis $cmd(1) }
+   } $cmd(2 ...)}
    fn-$name = $cmd
 }
 
