@@ -114,8 +114,8 @@ XDG_DATA_HOME=$HOME/.local/share
 # opam
 if {! empty `{which opam}} {
    fn oref {
-      let (ifs=\n)
-      for (i=`{opam env $* |sed '/^#/d;s/; export.*//'})
+      let (options = $*; ifs = \n)
+      for (i=`{opam env $options |sed '/^#/d;s/; export.*//'})
           eval $i
       return 0
    }
