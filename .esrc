@@ -152,7 +152,10 @@ alias py        python3
 alias pastebin  socat - openssl:tcp.st:8777
 alias ghc       ghc -no-keep-^(hi o)^-files
 alias ghci      ghci -v0
+alias idr       rlwrap -Aci idris2 --no-banner
+alias coq       rlwrap -Aci coqtop
 alias abuild    abuild -c
+alias unppx     ocamlc -dsource -stop-after parsing
 
 alias gr        grep -rn
 
