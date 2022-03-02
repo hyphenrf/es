@@ -120,6 +120,8 @@ XDG_CONFIG_HOME = $HOME/.local/etc
 XDG_CACHE_HOME  = $HOME/.local/tmp
 XDG_DATA_HOME   = $HOME/.local/share
 
+GOPATH = $XDG_DATA_HOME/go
+
 # opam
 if {! empty `{which opam}} {
    fn oref {
@@ -158,6 +160,9 @@ fn g { gr $* . }
 
 fn goarm args {
    local (GOARCH = arm) go build -ldflags '-s -w' $args
+}
+fn gowin args {
+   local (GOOS = windows) go build -ldflags '-s -w' $args
 }
 
 # hoogle
