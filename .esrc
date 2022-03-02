@@ -24,6 +24,11 @@ fn empty {~ $* ()}
 fn %% { bc <<<$^* }
 fn %! { bc -l <<<$^* }
 
+# TODO: bug: `export x` should be nop, `export x=3` should assign x
+fn export {}
+# TODO: bug: `:` should be in $fn-%eval*, so that `: x=3` is valid syntax
+fn : {}
+
 fn car xs { return $xs(1) }
 fn cdr xs { return $xs(2 ...) }
 fn ini xs { return $xs(1 ... `{%% $#xs - 1}) }
@@ -57,7 +62,7 @@ fn switch match cases {
 fn alias name cmd {
    if {~ $name $cmd(1)}{
       catch @{
-         cmd = throw error alias 'alias: command or function `'^$cmd(1)^'` not found.'
+         cmd = throw error alias alias: command or function $cmd(1) not found.
       }{
          cmd = <={ %whatis $cmd(1) } $cmd(2 ...)
       }
@@ -73,11 +78,6 @@ fn always-with-bash cmd {
   let (def = <={%whatis $cmd})
     fn-$cmd = with-bash $def
 }
-
-# TODO: bug: `export x` should be nop, `export x=3` should assign x
-fn export {}
-# TODO: bug: `:` should be in $fn-%eval*, so that `: x=3` is valid syntax
-fn : {}
 
 fn edfn fname cmd {
    eval `{var fn-$fname | $cmd}
@@ -110,10 +110,10 @@ path = (
 )
 
 PATH = <={%flatten : $(path) .}
-XDG_RUNTIME_DIR = <={car $XDG_RUNTIME_DIR /var/run/user/$USER}
-XDG_CONFIG_HOME=$HOME/.local/etc
-XDG_CACHE_HOME=$HOME/.local/tmp
-XDG_DATA_HOME=$HOME/.local/share
+XDG_RUNTIME_DIR = <={car $XDG_RUNTIME_DIR /tmp/$USER}
+XDG_CONFIG_HOME = $HOME/.local/etc
+XDG_CACHE_HOME  = $HOME/.local/tmp
+XDG_DATA_HOME   = $HOME/.local/share
 
 # opam
 if {! empty `{which opam}} {
