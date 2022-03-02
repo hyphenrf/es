@@ -2,6 +2,7 @@
 ############
 #
 # fn-empty:             returns whether a var is ()
+# fn-unless:            the opposite of fn-while
 # fn-%*:                convenience arithmetic functions
 # fn-(car cdr ini fin): list ops
 # fn-map:               map f xs
@@ -19,6 +20,10 @@
 ############
 
 fn empty {~ $* ()}
+
+fn unless cond body {
+   while {! $cond} $body
+}
 
 # TODO: bug: {%% 2 * 3} expands the globstar
 fn %% { bc <<<$^* }
