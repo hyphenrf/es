@@ -121,7 +121,7 @@ if {! empty `{which opam}} {
 
 # windows env helper
 fn winenv {
-   psh '$env:'$1 |sed -E 's/\s+$//'
+   psh -NonInteractive -NoProfile '$env:'$1 |sed -E 's/\s+$//'
 }
 
 
@@ -130,16 +130,17 @@ fn winenv {
 ##########
 
 alias vi        vis
-alias v         vis
+alias less      less -RS
 alias lc        ls -xF '--color=none'
 alias ls        ls -1 '--color=none'
-alias psh       powershell.exe
+alias psh       powershell.exe -NoLogo
 alias py        python3
 alias pastebin  socat - openssl:tcp.st:8777
 alias ghc       ghc -no-keep-^(hi o)^-files
 alias ghci      ghci -v0
-alias idr       rlwrap -Aci idris2 --no-banner
-alias coq       rlwrap -Aci coqtop
+alias idr       rlwrap -H /dev/null -nAci -- idris2 --no-banner
+alias coq       rlwrap -H /dev/null -nAci -- coqtop
+alias sml       rlwrap -H /dev/null -nAci -- smlsharp
 alias abuild    abuild -c
 alias unppx     ocamlc -dsource -stop-after parsing
 
@@ -147,11 +148,12 @@ alias gr        grep -rn
 
 fn g { gr $* . }
 
-fn goarm args {
-   local (GOARCH = arm) go build -ldflags '-s -w' $args
-}
-fn gowin args {
-   local (GOOS = windows) go build -ldflags '-s -w' $args
+fn posix-epoch {
+   %% `{
+     local (TZ = GMT0)
+       date '+((%Y-1600)*365+(%Y-1600)/4-(%Y-1600)/100+(%Y-1600)/400' \
+          ^ '+1%j-1000-135140)*86400+(1%H-100)*3600+(1%M-100)*60+(1%S-100)'
+   }
 }
 
 # hoogle
