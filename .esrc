@@ -7,13 +7,6 @@
 # fn-(car cdr ini fin): list ops
 # fn-map:               map f xs
 # fn-filter:            filter p xs
-# fn-switch:            implementation of the switch statement
-#     usage: switch expr {
-#              case lit single-cmd
-#              case 'pat0*' { ... }            # <- quotation needed, blocks too
-#              case 'pat1*' 'pat[0-9]' { ... } # <- because we have or-patterns
-#              default { ... }
-#            }
 # fn-alias:             alias a cmd, taken from the es examples
 # [always-]with-bash:   for commands that don't behave well under es
 # fn-export:            nop function, for compat with sh, useful in {opam env}
@@ -57,17 +50,6 @@ fn filter p xs {
       return <={
         if { $p $xs(1) }{ result $xs(1) }{ result () }
       } <={filter $p $xs(2 ...)}
-   }
-}
-
-fn switch match cases {
-   local ( # local scoping is cool, we can use these funs in callsite body
-     fn case    args { eval \~ $match <={ini $args} && <={fin $args} }
-     fn break   args { throw break <={empty $args || result $args} }
-     fn default args { $args }
-   )
-   catch @{if{ ~ $1 break }{ cdr $* }{ throw * }}{
-     $cases
    }
 }
 
