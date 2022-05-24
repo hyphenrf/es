@@ -202,14 +202,6 @@ fn gccrun args {
 }
 
 
-# set cwd as home when launching from windows terminal
-#
-local (cwd = `{pwd}) {
-   {~ $cwd /mnt/c/Users/`{winenv USERNAME}} && cd
-}
-
-
-
 # fun meta stuff
 #################
 #
