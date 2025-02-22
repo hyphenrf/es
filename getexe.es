@@ -1,9 +1,9 @@
 #!/usr/bin/es
 
 # /a/b/c.exe -> c
-fn getname path {
+fn getname pth {
    fin <={
-     %split / <={~~ $path *.exe}
+     %split / <={~~ $pth *.exe}
    }
 }
 
