@@ -18,13 +18,13 @@
 
 fn : {}
 
-fn empty {~ $* ()}
+fn empty {~ $*}
 
 fn unless cond body {
    while {! $cond} $body
 }
 
-# TODO: bug: {%% 2 * 3} expands the globstar
+# BUG: {%% 2 * 3} expands the globstar. just pass a string?
 fn %% { bc <<<$^* }
 fn %! { bc -l <<<$^* }
 
@@ -252,10 +252,10 @@ fn gccrun args {
 fn %eval-noprint { status = <=$* }
 
 let (loop = $fn-%interactive-loop)
- fn %interactive-loop { status = 0; $loop }
+fn %interactive-loop { status = 0; $loop }
 
 let (loop = $fn-%batch-loop)
- fn %batch-loop { status = 0; $loop }
+fn %batch-loop { status = 0; $loop }
 
 
 # colorize any text by rgb values
@@ -290,7 +290,7 @@ let (
   ogprom = $prompt
 )
 fn %prompt {
-   if { nonzero $status } {
+   if { nonzero $status }{
       prompt = <={ rgbcol $ogprom(3) 255 55 55 } $ogprom(2 ...)
    }{
       prompt = $ogprom
