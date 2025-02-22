@@ -1,6 +1,7 @@
-# functions
-############
+# utility functions
+####################
 #
+# 'fn-:':               nop function
 # fn-empty:             returns whether a var is ()
 # fn-unless:            the opposite of fn-while
 # fn-%*:                convenience arithmetic functions
@@ -9,11 +10,13 @@
 # fn-filter:            filter p xs
 # fn-alias:             alias a cmd, taken from the es examples
 # [always-]with-bash:   for commands that don't behave well under es
-# fn-export:            nop function, for compat with sh, useful in {opam env}
-# 'fn-:':               nop function
+# fn-export:            shim for compat with sh, useful in e.g. {opam env}
+# read-env:             reading environment after running a nontrivial command
 # fn-edfn:              edfn fn cmd: applies cmd on the function text
 #
-############
+####################
+
+fn : {}
 
 fn empty {~ $* ()}
 
@@ -24,11 +27,6 @@ fn unless cond body {
 # TODO: bug: {%% 2 * 3} expands the globstar
 fn %% { bc <<<$^* }
 fn %! { bc -l <<<$^* }
-
-# TODO: bug: `export x` should be nop, `export x=3` should assign x
-fn export {}
-# TODO: bug: `:` should be in $fn-%eval*, so that `: x=3` is valid syntax
-fn : {}
 
 fn car xs { return $xs(1) }
 fn cdr xs { return $xs(2 ...) }
@@ -73,6 +71,37 @@ fn always-with-bash cmd {
     fn-$cmd = with-bash $def
 }
 
+# apply an environment variable from a standard env(1p) output line
+fn read-env-var decl {
+   let ((var val) = <={%split '=' $decl}) $var = $^val
+   # $#val is never > 1 in env(1p) output, but may contain spaces!
+   # making $#val > 1 results in no-space concat at es interfacing!
+   # myvar = 1 2 3; env | grep myvar # => myvar=123
+}
+
+# this shim doesn't attempt to read full shell syntax, instead it calls /bin/sh
+# and handles env(1p) output format strictly.
+fn export decl {
+   # fast-path: do nothing on `export VAR`
+   if {!~ $decl *=*} return
+
+   # Note: sh -c expects flat cmd always
+   let (cmd = export $^decl '&&' unset SHLVL '&&' unset PWD '&&' env
+        decl = `` \n {env -i /bin/sh -c $^cmd})
+   read-env-var $decl
+}
+
+# specialized function for e.g. sourcing /etc/profile
+fn read-env cmd {
+  let (init-env = SHELL=/bin/sh LOGNAME=$LOGNAME USER=$USER UID=$UID HOME=$HOME
+       cmd = $^cmd '&&' unset SHLVL '&&' unset PWD '&&' env)
+  for (decl = `` \n {env -i PATH=$PATH $init-env /bin/sh -c $^cmd}) {
+    if {!~ $decl $saved-env}{
+       read-env-var $decl
+    }
+  }
+}
+
 fn edfn fname cmd {
    eval `{var fn-$fname | $cmd}
 }
@@ -90,6 +119,12 @@ fn edfn fname cmd {
 #
 ######
 
+# /etc/profile resets PATH, removing WSL entries :(
+let (old-path = $path) {
+  read-env source /etc/profile
+  path = $path $old-path
+}
+
 history  = ~/.es_history
 NO_COLOR = 1
 EDITOR   = vis
@@ -101,23 +136,24 @@ XDG_DATA_HOME   = $HOME/.local/share
 
 GOPATH = $XDG_DATA_HOME/go
 
-path = (
-  $HOME/.local/bin
-  $GOPATH/bin
-  $(path)
-  .
-)
-
-# opam
-if {! empty `{which opam}} {
-   fn oref {
-      let (options = $*; ifs = \n)
-      for (i=`{opam env $options |sed '/^#/d;s/; export.*//'})
-          eval $i
-      return 0
+# TODO: maybe run a hook on %prompt like opam does?
+if {whatis opam >[2=1] >/dev/null}{
+   fn oref options {
+      eval `{opam env $options}
    }
    oref
 }
+
+path = (
+  $HOME/.local/bin
+  $GOPATH/bin
+  $path
+)
+
+# Finally, remove redundancy from PATH
+# Note: don't split output by using the regular backquote, because that messes
+#  up the assertion $#PATH <= 1
+PATH = ``''{pathmerge $PATH}
 
 # windows env helper
 fn winenv {
